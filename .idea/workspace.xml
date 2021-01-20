@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="617af5a7-7f8c-40ab-b7c5-274abb6e9691" name="Default Changelist" comment="">
+    <list default="true" id="617af5a7-7f8c-40ab-b7c5-274abb6e9691" name="Default Changelist" comment="added main socket io events, added calendar parsing with ical library">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/smartdoor-backend.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/door-backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/door-backend.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
@@ -64,36 +88,63 @@
       <updated>1608482497299</updated>
       <workItem from="1608482499845" duration="8053000" />
     </task>
+    <task id="LOCAL-00001" summary="added main socket io events, added calendar parsing with ical library">
+      <created>1610243229191</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1610243229191</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="added main socket io events, added calendar parsing with ical library" />
+    <option name="LAST_COMMIT_MESSAGE" value="added main socket io events, added calendar parsing with ical library" />
+  </component>
   <component name="WindowStateProjectService">
-    <state width="2539" height="511" key="GridCell.Tab.0.bottom" timestamp="1610227797088">
+    <state x="904" y="269" key="CommitChangelistDialog2" timestamp="1610243194334">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="904" y="269" key="CommitChangelistDialog2/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610243194334" />
+    <state width="1257" height="412" key="GridCell.Tab.0.bottom" timestamp="1610478656517">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="745" height="343" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1609955893363" />
-    <state width="2539" height="511" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610227797088" />
-    <state width="1899" height="279" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610224481196" />
-    <state width="2539" height="511" key="GridCell.Tab.0.center" timestamp="1610227797087">
+    <state width="1257" height="412" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610478656517" />
+    <state width="693" height="412" key="GridCell.Tab.0.bottom/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610477921626" />
+    <state width="1257" height="412" key="GridCell.Tab.0.center" timestamp="1610478656517">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="745" height="343" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1609955893363" />
-    <state width="2539" height="511" key="GridCell.Tab.0.center/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610227797087" />
-    <state width="1899" height="279" key="GridCell.Tab.0.center/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610224481196" />
-    <state width="2539" height="511" key="GridCell.Tab.0.left" timestamp="1610227797087">
+    <state width="1257" height="412" key="GridCell.Tab.0.center/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610478656517" />
+    <state width="693" height="412" key="GridCell.Tab.0.center/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610477921626" />
+    <state width="1257" height="412" key="GridCell.Tab.0.left" timestamp="1610478656517">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="745" height="343" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1609955893362" />
-    <state width="2539" height="511" key="GridCell.Tab.0.left/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610227797087" />
-    <state width="1899" height="279" key="GridCell.Tab.0.left/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610224481196" />
-    <state width="2539" height="511" key="GridCell.Tab.0.right" timestamp="1610227797088">
+    <state width="1257" height="412" key="GridCell.Tab.0.left/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610478656517" />
+    <state width="693" height="412" key="GridCell.Tab.0.left/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610477921626" />
+    <state width="1257" height="412" key="GridCell.Tab.0.right" timestamp="1610478656517">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="745" height="343" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1609955893363" />
-    <state width="2539" height="511" key="GridCell.Tab.0.right/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610227797088" />
-    <state width="1899" height="279" key="GridCell.Tab.0.right/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610224481196" />
+    <state width="1257" height="412" key="GridCell.Tab.0.right/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1610478656517" />
+    <state width="693" height="412" key="GridCell.Tab.0.right/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1610477921626" />
     <state width="2539" height="492" key="GridCell.Tab.1.bottom" timestamp="1610213124789">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
