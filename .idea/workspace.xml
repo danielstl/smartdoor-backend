@@ -19,12 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="617af5a7-7f8c-40ab-b7c5-274abb6e9691" name="Default Changelist" comment="added basic messaging and video calling functionality">
-      <change afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+    <list default="true" id="617af5a7-7f8c-40ab-b7c5-274abb6e9691" name="Default Changelist" comment="progress on a registration system, and migration to doorlink.xyz domain">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +40,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
   <component name="ProjectId" id="1lvfTuAQYLes2uKH2ZgujGR9nJf" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -58,6 +61,7 @@
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Language Defaults" />
     <property name="ts.external.directory.path" value="C:\Users\Daniel\AppData\Local\JetBrains\Toolbox\apps\WebStorm\ch-0\202.8194.6\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -87,7 +91,9 @@
       <option name="presentableId" value="Default" />
       <updated>1608482497299</updated>
       <workItem from="1608482499845" duration="8053000" />
-      <workItem from="1611354717096" duration="14351000" />
+      <workItem from="1611354717096" duration="21150000" />
+      <workItem from="1611659369328" duration="18259000" />
+      <workItem from="1613315916295" duration="2051000" />
     </task>
     <task id="LOCAL-00001" summary="added main socket io events, added calendar parsing with ical library">
       <created>1610243229191</created>
@@ -103,7 +109,14 @@
       <option name="project" value="LOCAL" />
       <updated>1611151218736</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="progress on a registration system, and migration to doorlink.xyz domain">
+      <created>1611522847345</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1611522847346</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -124,7 +137,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added main socket io events, added calendar parsing with ical library" />
     <MESSAGE value="added basic messaging and video calling functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="added basic messaging and video calling functionality" />
+    <MESSAGE value="progress on a registration system, and migration to doorlink.xyz domain" />
+    <option name="LAST_COMMIT_MESSAGE" value="progress on a registration system, and migration to doorlink.xyz domain" />
   </component>
   <component name="WindowStateProjectService">
     <state x="904" y="269" key="CommitChangelistDialog2" timestamp="1610243194334">
@@ -219,13 +233,22 @@
       <screen x="3840" y="1059" width="1920" height="1040" />
     </state>
     <state x="4857" y="1419" key="RollbackChangesDialog/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611506184055" />
-    <state x="873" y="433" key="Vcs.Push.Dialog.v2" timestamp="1611151230196">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="873" y="433" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1611151230196" />
-    <state x="4463" y="1284" width="672" height="678" key="search.everywhere.popup" timestamp="1611505850603">
+    <state x="4301" y="1223" key="SettingsEditor" timestamp="1611535504691">
       <screen x="3840" y="1059" width="1920" height="1040" />
     </state>
-    <state x="4463" y="1284" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611505850603" />
+    <state x="4301" y="1223" key="SettingsEditor/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611535504691" />
+    <state x="4495" y="1381" key="Vcs.Push.Dialog.v2" timestamp="1611522849097">
+      <screen x="3840" y="1059" width="1920" height="1040" />
+    </state>
+    <state x="873" y="433" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1611151230196" />
+    <state x="4495" y="1381" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611522849097" />
+    <state x="987" y="433" width="587" height="534" key="find.popup" timestamp="1612965899826">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="987" y="433" width="587" height="534" key="find.popup/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1612965899826" />
+    <state x="4463" y="1284" width="672" height="678" key="search.everywhere.popup" timestamp="1611535517673">
+      <screen x="3840" y="1059" width="1920" height="1040" />
+    </state>
+    <state x="4463" y="1284" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611535517673" />
   </component>
 </project>
