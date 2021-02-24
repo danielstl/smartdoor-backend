@@ -5,12 +5,8 @@ const app = express();
 const server = app.listen(ipConfig.port);
 const io = require("socket.io")(server, {
     cors: {
-        origin: "*",
-        //     credentials: true
-    },
-    //extraHeaders: {
-    //    'Access-Control-Allow-Credentials': 'omit'
-    //}
+        origin: "*"
+    }
 });
 const fetch = require("node-fetch");
 
@@ -18,6 +14,9 @@ const ical = require("ical");
 const cors = require("cors");
 const multer = require("multer");
 const history = require("connect-history-api-fallback"); //SPA redirection
+const bcrypt = require("bcrypt");
+
+let BCRYPT_SALT_PROC_COST = 12;
 
 const URL = "https://doorlink.xyz/";
 
@@ -82,7 +81,7 @@ mongoClient.connect(databaseUrl).then(db => {
         console.log("Saved image: " + path);
 
         io.emit("background_update", URL + path);
-        res.status(200).redirect("/manage/customise"); //todo temporary
+        res.status(200);
 
         await displays.updateOne({"roomId": req.params.roomId}, {"$set": {"backgroundUrl": URL + path}});
     });
@@ -97,7 +96,7 @@ mongoClient.connect(databaseUrl).then(db => {
 
         console.log("Saved image: " + path);
 
-        res.status(200).redirect("/manage/profile"); //todo temporary
+        res.status(200);
 
         let doc = await displays.findOneAndUpdate({"roomId": req.params.roomId}, {"$set": {"user.profileImage": URL + path}}, {returnOriginal: false});
 
@@ -115,30 +114,48 @@ mongoClient.connect(databaseUrl).then(db => {
         res.status(200).json({url: path});
     });
 
-    let clientRooms = {}; //will be a map of clients -> room code
+    /*
+    Client object with the following structure:
+    socketID: {
+        room: "1923929",
+        management: true
+    }
+     */
+    let clients = {}
 
     async function getActiveDisplay(client) {
-        return !clientRooms[client] ? null : await displays.findOne({"roomId": clientRooms[client]});
+        return !clients[client.id] ? null : await displays.findOne({"roomId": clients[client.id].room});
     }
 
     async function findAndUpdateActiveDisplay(client, updateQuery, options) {
-        return !clientRooms[client] ? null : await displays.findOneAndUpdate({"roomId": clientRooms[client]}, updateQuery, options);
+        return !clients[client.id] ? null : await displays.findOneAndUpdate({"roomId": clients[client.id].room}, updateQuery, options);
     }
 
-    io.use((socket, next) => {
-        next(); //TODO: middleware for authentication if needed goes here https://socket.io/docs/v3/middlewares/
-    });
+    function registerClientEvents(client, newPairing) {
+        client.join(clients[client.id].room); //join them to the room for their room id
+        console.log("joined client to room " + clients[client.id].room);
 
-    function registerClientEvents(client, enableManagementEvents, newPairing) {
-        client.join(clientRooms[client]); //join them to the room for their room id
-        console.log("joined client to room " + clientRooms[client]);
+        const enableManagementEvents = clients[client.id].management;
 
-        if (newPairing) {
-            io.in(clientRooms[client]).emit("new_device_joined");
+        if (enableManagementEvents) {
+            console.log("management for " + client.id);
         }
 
+        const roomCode = () => clients[client.id].room;
+
+        if (newPairing) {
+            io.in(roomCode()).emit("new_device_joined");
+        }
+
+        client.on("disconnect", () => {
+            console.log("Client disconnect!");
+
+            //remove from rooms and storage
+            delete clients[client.id];
+        })
+
         client.on("get_room_id", async () => {
-            client.emit("room_id", clientRooms[client]);
+            client.emit("room_id", roomCode());
         });
 
         client.on("get_user", async () => {
@@ -198,7 +215,7 @@ mongoClient.connect(databaseUrl).then(db => {
                 eventData = await getAllCalendarData(doc.calendars);
             }
 
-            io.in(clientRooms[client]).emit("calendar_update", eventData);
+            io.in(roomCode()).emit("calendar_update", eventData);
         });
 
         client.on("send_message", async message => {
@@ -211,19 +228,29 @@ mongoClient.connect(databaseUrl).then(db => {
                 fromSystem: enableManagementEvents,
                 timestamp: new Date().getTime()
             }
-            io.in(clientRooms[client]).emit("new_message", messageObj);
+            io.in(roomCode()).emit("new_message", messageObj);
         });
 
         //video chat
 
-        client.on("start_intercom_call", requestId => {
+        client.on("start_intercom_call", async requestId => {
             if (requestId === undefined) {
                 return;
             }
 
-            io.in(clientRooms[client]).emit("intercom_call_request", requestId.toString());
+            let doc = await getActiveDisplay(client);
+
+            if (!doc || doc.user.status === "DO_NOT_DISTURB") {
+                return; //can't call in do not disturb mode
+            }
+
+            io.in(roomCode()).emit("intercom_call_request", requestId.toString());
             //console.log("CALL!", sdp);
             //client.broadcast.emit("intercom_call_signalling", {message: "sdp", sdp});
+        });
+
+        client.on("cancel_call_request", async requestId => {
+            io.in(roomCode()).emit("cancel_call_request", requestId.toString());
         });
 
         client.on("decline_call_request", requestId => {
@@ -231,7 +258,7 @@ mongoClient.connect(databaseUrl).then(db => {
                 return;
             }
 
-            io.in(clientRooms[client]).emit("decline_call_request", requestId.toString());
+            io.in(roomCode()).emit("decline_call_request", requestId.toString());
         });
 
         client.on("end_intercom_call", requestId => {
@@ -239,7 +266,7 @@ mongoClient.connect(databaseUrl).then(db => {
                 return;
             }
 
-            io.in(clientRooms[client]).emit("end_intercom_call", requestId.toString());
+            io.in(roomCode()).emit("end_intercom_call", requestId.toString());
         });
 
         client.on("intercom_call_signalling", data => {
@@ -250,33 +277,56 @@ mongoClient.connect(databaseUrl).then(db => {
         client.on("add_doodle", async doodleUrl => {
             let doc = await findAndUpdateActiveDisplay(client, {"$push": {"doodles": doodleUrl.toString()}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("doodles_update", doc.value.doodles);
+            io.in(roomCode()).emit("doodles_update", doc.value.doodles);
         });
 
         if (!enableManagementEvents) return; //don't register management events
 
+        client.on("logout", async sessionId => {
+
+            if (typeof sessionId !== "string") {
+                return;
+            }
+
+            await findAndUpdateActiveDisplay(client, {"$pull": {"sessions": {"code": sessionId}}});
+
+            client.leave(roomCode());
+            client.disconnect();
+
+            delete clients[client.id];
+        });
+
         client.on("reset_room_id", async () => {
-            let room = clientRooms[client];
+            let room = roomCode();
 
             if (room !== null) {
                 let newId = generateRoomId();
                 await displays.updateOne({"roomId": room}, {"$set": {"roomId": newId}});
 
-                clientRooms[client] = newId;
+                const sockets = io.sockets.adapter.rooms.get(room);
 
-                client.emit("room_id", newId);
+                console.log(clients);
 
-                client.join(newId);
+                sockets.forEach(id => {
+                    const c = io.sockets.sockets.get(id);
 
-                //Kick old clients out
-                io.of('/').in(room).clients(function (error, clients) {
-                    if (error || !clients) {
-                        return;
+                    console.log(id, !!c, clients[id], clients);
+
+                    let clientInfo = clients[id];
+
+                    c.leave(room);
+
+                    if (clientInfo.management) { //if client is using management app...
+                        clients[id].room = newId; //...join to new room
+                        console.log("Joined client to new room " + newId);
+                        c.emit("room_id", newId);
+                        c.join(newId);
+                    } else { //if client is a display...
+                        console.log("Invalidated and kicked display client due to room change");
+                        c.emit("room_invalidate"); //...kick them out instead
+                        c.disconnect();
+                        delete clients[id];
                     }
-
-                    clients.forEach(function (c) {
-                        io.sockets.sockets[c].leave(room);
-                    });
                 });
             }
         });
@@ -284,31 +334,31 @@ mongoClient.connect(databaseUrl).then(db => {
         client.on("remove_doodle", async doodleUrl => {
             let doc = await findAndUpdateActiveDisplay(client, {"$pull": {"doodles": doodleUrl.toString()}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("doodles_update", doc.value.doodles);
+            io.in(roomCode()).emit("doodles_update", doc.value.doodles);
         });
 
         client.on("update_status", async status => {
             let doc = await findAndUpdateActiveDisplay(client, {"$set": {"user.status": status.toString()}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("user_update", doc.value.user);
+            io.in(roomCode()).emit("user_update", doc.value.user);
         });
 
         client.on("update_name", async name => {
             let doc = await findAndUpdateActiveDisplay(client, {"$set": {"user.name": name.toString()}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("user_update", doc.value.user);
+            io.in(roomCode()).emit("user_update", doc.value.user);
         });
 
         client.on("remove_profile_picture", async () => {
             let doc = await findAndUpdateActiveDisplay(client, {"$set": {"user.profileImage": null}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("user_update", doc.value.user);
+            io.in(roomCode()).emit("user_update", doc.value.user);
         });
 
         client.on("remove_background_image", async () => {
             await findAndUpdateActiveDisplay(client, {"$set": {"backgroundUrl": null}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("background_update", null);
+            io.in(roomCode()).emit("background_update", null);
         });
 
         client.on("update_widgets", async widgets => {
@@ -327,7 +377,7 @@ mongoClient.connect(databaseUrl).then(db => {
 
             await findAndUpdateActiveDisplay(client, {"$set": {"widgets": sanitizedWidgets}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("widgets_update", sanitizedWidgets);
+            io.in(roomCode()).emit("widgets_update", sanitizedWidgets);
         });
 
         client.on("update_notes", async notes => {
@@ -356,7 +406,7 @@ mongoClient.connect(databaseUrl).then(db => {
 
             let doc = await findAndUpdateActiveDisplay(client, {"$set": {"notes": sanitizedNotes}}, {returnOriginal: false});
 
-            io.in(clientRooms[client]).emit("notes_update", doc.value.notes);
+            io.in(roomCode()).emit("notes_update", doc.value.notes);
         })
 
         client.on("update_calendar", async calendars => {
@@ -378,24 +428,24 @@ mongoClient.connect(databaseUrl).then(db => {
 
             let eventData = await getAllCalendarData(calendars);
 
-            io.in(clientRooms[client]).emit("calendar_update", eventData);
+            io.in(roomCode()).emit("calendar_update", eventData);
 
             /*if (url) {
                 let data = await getCalendarData(url);
-                io.in(clientRooms[client]).emit("calendar_update", {url, data});
+                io.in(roomCode()).emit("calendar_update", {url, data});
             } else {
-                io.in(clientRooms[client]).emit("calendar_update", null);
+                io.in(roomCode()).emit("calendar_update", null);
             }*/
         });
 
         client.on("clear_messages", () => {
-            io.in(clientRooms[client]).emit("clear_messages");
+            io.in(roomCode()).emit("clear_messages");
         });
 
         client.on("delete_doodles", async () => {
             await findAndUpdateActiveDisplay(client, {"$set": {"doodles": []}})
 
-            io.in(clientRooms[client]).emit("doodles_update", []);
+            io.in(roomCode()).emit("doodles_update", []);
         });
     }
 
@@ -403,17 +453,16 @@ mongoClient.connect(databaseUrl).then(db => {
     io.on("connection", client => {
         console.log("Client connected");
 
-        client.on("disconnect", () => {
-            delete clientRooms[client];
-        });
-
         client.on("join_room", async (roomCode, newPairing) => {
             let doc = await displays.findOne({"roomId": roomCode});
 
             if (doc) {
-                clientRooms[client] = roomCode;
-
-                registerClientEvents(client, true, newPairing); //allow clients to use the rest of the system
+                //Login success!
+                clients[client.id] = {
+                    room: roomCode,
+                    management: false
+                };
+                registerClientEvents(client, newPairing); //allow clients to use the rest of the system
 
                 client.emit("room_joined", roomCode);
             } else {
@@ -421,21 +470,128 @@ mongoClient.connect(databaseUrl).then(db => {
             }
         });
 
-        client.on("temp_join", async () => { //TODO
-            let doc = await displays.findOne({"_id": "user1"});
+        client.on("login_from_session", async sessionId => {
 
-            if (doc) {
-                clientRooms[client] = doc.roomId;
+            if (typeof sessionId !== "string") {
+                return;
+            }
 
-                registerClientEvents(client, true); //allow clients to use the rest of the system
+            let doc = await checkSessionId(displays, sessionId);
 
-                client.emit("room_joined", doc.roomId);
+            if (!doc) {
+                client.emit("login_failure", "Your log-in has expired")
             } else {
-                client.emit("invalid_room_code");
+                //Login success!
+                //Login success!
+                clients[client.id] = {
+                    room: doc.roomId,
+                    management: true
+                };
+                registerClientEvents(client, false); //allow clients to use the rest of the system
+                client.emit("room_joined", doc.roomId);
+                client.emit("login_success", sessionId, doc.username, false);
             }
         });
 
+        client.on("login", async (username, password) => {
+            if (!username || !(typeof username === "string")) {
+                client.emit("login_failure", "Invalid username");
+                return;
+            }
 
+            if (!password || !(typeof password === "string")) {
+                client.emit("login_failure", "Invalid password");
+                return;
+            }
+
+            let doc = await displays.findOne({"username": username});
+
+            if (!doc) {
+                client.emit("login_failure", "Invalid username");
+                return;
+            }
+
+            try {
+                let res = await bcrypt.compare(password, doc.password);
+
+                if (!res) {
+                    client.emit("login_failure", "Incorrect password");
+                    return;
+                }
+
+                //Login success!
+                clients[client.id] = {
+                    room: doc.roomId,
+                    management: true
+                };
+                registerClientEvents(client, false); //allow clients to use the rest of the system
+
+                client.emit("room_joined", doc.roomId);
+                client.emit("login_success", (await createSessionId(displays, doc._id)).code, doc.username, false);
+
+            } catch (e) {
+                client.emit("login_failure", "Error checking password");
+                return;
+            }
+        });
+
+        client.on("register", async (username, password) => {
+
+            if (!username || !(typeof username === "string")) {
+                client.emit("login_failure", "Invalid username");
+                return;
+            }
+
+            if (username.length < 3 || username.length > 20) {
+                client.emit("login_failure", "Username must be between 3 and 20 characters");
+                return;
+            }
+
+            let doc = await displays.findOne({"username": username});
+
+            if (doc) {
+                client.emit("login_failure", "Account already exists");
+                return;
+            }
+
+            if (!password || !(typeof password === "string")) {
+                client.emit("login_failure", "Invalid password");
+                return;
+            }
+
+            if (password.length < 8 || username.length > 32) {
+                client.emit("login_failure", "Password must be between 8 and 32 characters");
+                return;
+            }
+
+            let hashed = await bcrypt.hash(password, BCRYPT_SALT_PROC_COST);
+            let roomId = generateRoomId();
+
+            let id = await displays.insertOne({
+                username,
+                password: hashed,
+                roomId,
+                user: {
+                    name: "New User",
+                    status: "AVAILABLE",
+                    profileImage: null
+                },
+                backgroundUrl: null,
+                notes: [],
+                calendars: [],
+                widgets: ["PinnedMessagesWidget", "ScheduleWidget", "WhiteboardWidget"],
+                doodles: []
+            }).insertedId;
+
+            //Login success!
+            clients[client.id] = {
+                room: roomId,
+                management: true
+            };
+            registerClientEvents(client, false); //allow clients to use the rest of the system
+            client.emit("room_joined", roomId);
+            client.emit("login_success", (await createSessionId(displays, id)).code, username, true);
+        });
     });
 });
 
@@ -478,4 +634,26 @@ async function getCalendarData(url) {
 
             }
         }*/
+}
+
+async function createSessionId(collection, displayId) {
+    let now = new Date().getTime();
+    let sessionId = {
+        code: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+        created: now,
+        lastAccess: now
+    };
+
+    await collection.updateOne({_id: displayId}, {$addToSet: {sessions: sessionId}});
+    return sessionId;
+}
+
+async function checkSessionId(collection, sessionId) {
+    let doc = await collection.findOne({"sessions.code": sessionId});
+
+    if (!doc) {
+        return null;
+    }
+
+    return doc;
 }

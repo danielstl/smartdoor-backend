@@ -19,9 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="617af5a7-7f8c-40ab-b7c5-274abb6e9691" name="Default Changelist" comment="progress on a registration system, and migration to doorlink.xyz domain">
+    <list default="true" id="617af5a7-7f8c-40ab-b7c5-274abb6e9691" name="Default Changelist" comment="additional data validation, and doodle support">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +96,9 @@
       <workItem from="1611354717096" duration="21150000" />
       <workItem from="1611659369328" duration="18259000" />
       <workItem from="1613315916295" duration="2051000" />
+      <workItem from="1613491856910" duration="1680000" />
+      <workItem from="1613676500927" duration="11973000" />
+      <workItem from="1614036990609" duration="8578000" />
     </task>
     <task id="LOCAL-00001" summary="added main socket io events, added calendar parsing with ical library">
       <created>1610243229191</created>
@@ -116,7 +121,14 @@
       <option name="project" value="LOCAL" />
       <updated>1611522847346</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="additional data validation, and doodle support">
+      <created>1613491921667</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1613491921667</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,7 +150,8 @@
     <MESSAGE value="added main socket io events, added calendar parsing with ical library" />
     <MESSAGE value="added basic messaging and video calling functionality" />
     <MESSAGE value="progress on a registration system, and migration to doorlink.xyz domain" />
-    <option name="LAST_COMMIT_MESSAGE" value="progress on a registration system, and migration to doorlink.xyz domain" />
+    <MESSAGE value="additional data validation, and doodle support" />
+    <option name="LAST_COMMIT_MESSAGE" value="additional data validation, and doodle support" />
   </component>
   <component name="WindowStateProjectService">
     <state x="904" y="269" key="CommitChangelistDialog2" timestamp="1610243194334">
@@ -237,15 +250,15 @@
       <screen x="3840" y="1059" width="1920" height="1040" />
     </state>
     <state x="4301" y="1223" key="SettingsEditor/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611535504691" />
-    <state x="4495" y="1381" key="Vcs.Push.Dialog.v2" timestamp="1611522849097">
+    <state x="4495" y="1381" key="Vcs.Push.Dialog.v2" timestamp="1613491922976">
       <screen x="3840" y="1059" width="1920" height="1040" />
     </state>
     <state x="873" y="433" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1611151230196" />
-    <state x="4495" y="1381" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1611522849097" />
-    <state x="987" y="433" width="587" height="534" key="find.popup" timestamp="1612965899826">
+    <state x="4495" y="1381" key="Vcs.Push.Dialog.v2/0.0.2560.1400/3840.1059.1920.1040@3840.1059.1920.1040" timestamp="1613491922976" />
+    <state x="987" y="433" width="587" height="592" key="find.popup" timestamp="1614131117661">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="987" y="433" width="587" height="534" key="find.popup/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1612965899826" />
+    <state x="987" y="433" width="587" height="592" key="find.popup/0.0.2560.1400/3840.1059.1920.1040@0.0.2560.1400" timestamp="1614131117661" />
     <state x="4463" y="1284" width="672" height="678" key="search.everywhere.popup" timestamp="1611535517673">
       <screen x="3840" y="1059" width="1920" height="1040" />
     </state>
